@@ -84,6 +84,13 @@ if [ "$BASIC" = true ] ; then
     echo "Installing PyTorch 2.6.0..."
     if [ "$PLATFORM" = "cuda" ] ; then
         pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
+        # Fix missing libcusparseLt.so.0 error by installing the library and updating LD_LIBRARY_PATH
+        pip install nvidia-cusparselt-cu12
+        
+        # Add nvidia-cusparselt lib to LD_LIBRARY_PATH
+        SITE_PACKAGES=$(python3 -c "import site; print(site.getsitepackages()[0])")
+        export LD_LIBRARY_PATH="$SITE_PACKAGES/nvidia/cusparselt/lib:$LD_LIBRARY_PATH"
+        echo "Updated LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
     elif [ "$PLATFORM" = "hip" ] ; then
         pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/rocm6.2.4
     fi
