@@ -16,17 +16,23 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Miniconda
-RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && mkdir /root/.conda \
-    && bash Miniconda3-latest-Linux-x86_64.sh -b \
-    && rm -f Miniconda3-latest-Linux-x86_64.sh
+# Install system dependencies (including Python 3.10)
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    ffmpeg \
+    libgl1-mesa-glx \
+    libjpeg-dev \
+    python3-dev \
+    python3-pip \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create conda environment
-RUN conda create -n trellis2 python=3.10 -y
+# Set python3 as default
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
-# Make sure we use the conda environment for subsequent commands
-SHELL ["conda", "run", "-n", "trellis2", "/bin/bash", "-c"]
+# Upgrade pip
+RUN pip3 install --upgrade pip setuptools wheel
 
 # Install PyTorch (CUDA 12.4) as per setup.sh
 RUN pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124

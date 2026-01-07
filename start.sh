@@ -1,4 +1,3 @@
 #!/bin/bash
-source /root/miniconda3/etc/profile.d/conda.sh
-conda activate trellis2
-python app.py
+# No conda needed, we are using system python
+python3 app.py
