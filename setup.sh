@@ -79,17 +79,15 @@ else
     exit 1
 fi
 
-if [ "$NEW_ENV" = true ] ; then
-    conda create -n trellis2 python=3.10
-    conda activate trellis2
+if [ "$BASIC" = true ] ; then
+    # Install PyTorch 2.6.0 (Force upgrade for RunPod)
+    echo "Installing PyTorch 2.6.0..."
     if [ "$PLATFORM" = "cuda" ] ; then
         pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
     elif [ "$PLATFORM" = "hip" ] ; then
         pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/rocm6.2.4
     fi
-fi
 
-if [ "$BASIC" = true ] ; then
     # Install system dependencies
     apt-get update && apt-get install -y --no-install-recommends \
         git \
