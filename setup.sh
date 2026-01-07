@@ -98,12 +98,19 @@ if [ "$BASIC" = true ] ; then
     pip install kornia timm
 fi
 
+    # Create symlink for Eigen so it can be found
+    if [ ! -d "/usr/include/Eigen" ] && [ -d "/usr/include/eigen3/Eigen" ]; then
+        ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
+    fi
+fi
+
 if [ "$FLASHATTN" = true ] ; then
     if [ "$PLATFORM" = "cuda" ] ; then
         pip install flash-attn==2.7.3
     elif [ "$PLATFORM" = "hip" ] ; then
         echo "[FLASHATTN] Prebuilt binaries not found. Building from source..."
         mkdir -p /tmp/extensions
+        rm -rf /tmp/extensions/flash-attention
         git clone --recursive https://github.com/ROCm/flash-attention.git /tmp/extensions/flash-attention
         cd /tmp/extensions/flash-attention
         git checkout tags/v2.7.3-cktile
@@ -117,6 +124,7 @@ fi
 if [ "$NVDIFFRAST" = true ] ; then
     if [ "$PLATFORM" = "cuda" ] ; then
         mkdir -p /tmp/extensions
+        rm -rf /tmp/extensions/nvdiffrast
         git clone -b v0.4.0 https://github.com/NVlabs/nvdiffrast.git /tmp/extensions/nvdiffrast
         pip install /tmp/extensions/nvdiffrast --no-build-isolation
     else
@@ -127,6 +135,7 @@ fi
 if [ "$NVDIFFREC" = true ] ; then
     if [ "$PLATFORM" = "cuda" ] ; then
         mkdir -p /tmp/extensions
+        rm -rf /tmp/extensions/nvdiffrec
         git clone -b renderutils https://github.com/JeffreyXiang/nvdiffrec.git /tmp/extensions/nvdiffrec
         pip install /tmp/extensions/nvdiffrec --no-build-isolation
     else
@@ -136,18 +145,21 @@ fi
 
 if [ "$CUMESH" = true ] ; then
     mkdir -p /tmp/extensions
+    rm -rf /tmp/extensions/CuMesh
     git clone https://github.com/JeffreyXiang/CuMesh.git /tmp/extensions/CuMesh --recursive
     pip install /tmp/extensions/CuMesh --no-build-isolation
 fi
 
 if [ "$FLEXGEMM" = true ] ; then
     mkdir -p /tmp/extensions
+    rm -rf /tmp/extensions/FlexGEMM
     git clone https://github.com/JeffreyXiang/FlexGEMM.git /tmp/extensions/FlexGEMM --recursive
     pip install /tmp/extensions/FlexGEMM --no-build-isolation
 fi
 
 if [ "$OVOXEL" = true ] ; then
     mkdir -p /tmp/extensions
+    rm -rf /tmp/extensions/o-voxel
     cp -r o-voxel /tmp/extensions/o-voxel
     pip install /tmp/extensions/o-voxel --no-build-isolation
 fi
