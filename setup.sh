@@ -98,10 +98,10 @@ if [ "$BASIC" = true ] ; then
     pip install kornia timm
 fi
 
-    # Create symlink for Eigen so it can be found
-    if [ ! -d "/usr/include/Eigen" ] && [ -d "/usr/include/eigen3/Eigen" ]; then
-        ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
-    fi
+
+# Create symlink for Eigen so it can be found
+if [ ! -d "/usr/include/Eigen" ] && [ -d "/usr/include/eigen3/Eigen" ]; then
+    ln -s /usr/include/eigen3/Eigen /usr/include/Eigen
 fi
 
 if [ "$FLASHATTN" = true ] ; then
