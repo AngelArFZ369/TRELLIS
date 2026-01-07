@@ -57,6 +57,19 @@ fi
 
 # Get system information
 WORKDIR=$(pwd)
+
+# Use workspace for temp files if available (persistent volume), otherwise fallback to /tmp
+if [ -d "/workspace" ]; then
+    TMP_DIR="/workspace/tmp"
+    mkdir -p "$TMP_DIR"
+    export TMPDIR="$TMP_DIR"
+    export PIP_CACHE_DIR="$TMP_DIR/pip-cache"
+    echo "Using persistent volume for temp files: $TMP_DIR"
+else
+    TMP_DIR="/tmp"
+    echo "Using default temp directory: $TMP_DIR"
+fi
+
 if command -v nvidia-smi > /dev/null; then
     PLATFORM="cuda"
 elif command -v rocminfo > /dev/null; then
@@ -109,10 +122,10 @@ if [ "$FLASHATTN" = true ] ; then
         pip install flash-attn==2.7.3
     elif [ "$PLATFORM" = "hip" ] ; then
         echo "[FLASHATTN] Prebuilt binaries not found. Building from source..."
-        mkdir -p /tmp/extensions
-        rm -rf /tmp/extensions/flash-attention
-        git clone --recursive https://github.com/ROCm/flash-attention.git /tmp/extensions/flash-attention
-        cd /tmp/extensions/flash-attention
+        mkdir -p ${TMP_DIR}/extensions
+        rm -rf ${TMP_DIR}/extensions/flash-attention
+        git clone --recursive https://github.com/ROCm/flash-attention.git ${TMP_DIR}/extensions/flash-attention
+        cd ${TMP_DIR}/extensions/flash-attention
         git checkout tags/v2.7.3-cktile
         GPU_ARCHS=gfx942 python setup.py install #MI300 series
         cd $WORKDIR
@@ -123,10 +136,10 @@ fi
 
 if [ "$NVDIFFRAST" = true ] ; then
     if [ "$PLATFORM" = "cuda" ] ; then
-        mkdir -p /tmp/extensions
-        rm -rf /tmp/extensions/nvdiffrast
-        git clone -b v0.4.0 https://github.com/NVlabs/nvdiffrast.git /tmp/extensions/nvdiffrast
-        pip install /tmp/extensions/nvdiffrast --no-build-isolation
+        mkdir -p ${TMP_DIR}/extensions
+        rm -rf ${TMP_DIR}/extensions/nvdiffrast
+        git clone -b v0.4.0 https://github.com/NVlabs/nvdiffrast.git ${TMP_DIR}/extensions/nvdiffrast
+        pip install ${TMP_DIR}/extensions/nvdiffrast --no-build-isolation
     else
         echo "[NVDIFFRAST] Unsupported platform: $PLATFORM"
     fi
@@ -134,32 +147,32 @@ fi
 
 if [ "$NVDIFFREC" = true ] ; then
     if [ "$PLATFORM" = "cuda" ] ; then
-        mkdir -p /tmp/extensions
-        rm -rf /tmp/extensions/nvdiffrec
-        git clone -b renderutils https://github.com/JeffreyXiang/nvdiffrec.git /tmp/extensions/nvdiffrec
-        pip install /tmp/extensions/nvdiffrec --no-build-isolation
+        mkdir -p ${TMP_DIR}/extensions
+        rm -rf ${TMP_DIR}/extensions/nvdiffrec
+        git clone -b renderutils https://github.com/JeffreyXiang/nvdiffrec.git ${TMP_DIR}/extensions/nvdiffrec
+        pip install ${TMP_DIR}/extensions/nvdiffrec --no-build-isolation
     else
         echo "[NVDIFFREC] Unsupported platform: $PLATFORM"
     fi
 fi
 
 if [ "$CUMESH" = true ] ; then
-    mkdir -p /tmp/extensions
-    rm -rf /tmp/extensions/CuMesh
-    git clone https://github.com/JeffreyXiang/CuMesh.git /tmp/extensions/CuMesh --recursive
-    pip install /tmp/extensions/CuMesh --no-build-isolation
+    mkdir -p ${TMP_DIR}/extensions
+    rm -rf ${TMP_DIR}/extensions/CuMesh
+    git clone https://github.com/JeffreyXiang/CuMesh.git ${TMP_DIR}/extensions/CuMesh --recursive
+    pip install ${TMP_DIR}/extensions/CuMesh --no-build-isolation
 fi
 
 if [ "$FLEXGEMM" = true ] ; then
-    mkdir -p /tmp/extensions
-    rm -rf /tmp/extensions/FlexGEMM
-    git clone https://github.com/JeffreyXiang/FlexGEMM.git /tmp/extensions/FlexGEMM --recursive
-    pip install /tmp/extensions/FlexGEMM --no-build-isolation
+    mkdir -p ${TMP_DIR}/extensions
+    rm -rf ${TMP_DIR}/extensions/FlexGEMM
+    git clone https://github.com/JeffreyXiang/FlexGEMM.git ${TMP_DIR}/extensions/FlexGEMM --recursive
+    pip install ${TMP_DIR}/extensions/FlexGEMM --no-build-isolation
 fi
 
 if [ "$OVOXEL" = true ] ; then
-    mkdir -p /tmp/extensions
-    rm -rf /tmp/extensions/o-voxel
-    cp -r o-voxel /tmp/extensions/o-voxel
-    pip install /tmp/extensions/o-voxel --no-build-isolation
+    mkdir -p ${TMP_DIR}/extensions
+    rm -rf ${TMP_DIR}/extensions/o-voxel
+    cp -r o-voxel ${TMP_DIR}/extensions/o-voxel
+    pip install ${TMP_DIR}/extensions/o-voxel --no-build-isolation
 fi
