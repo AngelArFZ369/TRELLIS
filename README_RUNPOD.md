@@ -32,12 +32,13 @@ docker push your-username/trellis2-runpod
 2.  Click **Deploy Pod**.
 3.  Select a GPU. **Recommended**: NVIDIA A40 (48GB) or RTX A6000 (48GB). The 4B model is VRAM intensive.
 4.  Click **Select Template** > **Customize Pod**.
-    *   **Container Image**: `your-username/trellis2-runpod` (the one you just pushed).
+    *   **Container Image**: `angelarfz/trellis2-runpod` (the one you just pushed).
     *   **Exposed Ports**: `7860` (this is crucial for the web UI).
     *   **Environment Variables**:
         *   Key: `HF_TOKEN` (Optional, if you need access to gated models, though TRELLIS.2 seems public).
-    *   **Container Disk**: Increase to at least **20 GB** (to store model weights).
-    *   **Volume Disk**: Optional, but recommended for persistent storage.
+        *   Key: `HF_HOME` (Recommended: `/workspace/hf-cache`). This tells Hugging Face to store models in the persistent volume.
+    *   **Container Disk**: Increase to at least **20 GB** (to store model weights if not using persistent volume).
+    *   **Volume Disk**: Mounted at `/workspace`. Recommended: **20 GB+**. If you set `HF_HOME` as above, your models will persist here after restarts.
 5.  Click **Set Overrides** and then **Deploy**.
 
 ## Step 4: Access the Application
