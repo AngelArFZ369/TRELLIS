@@ -77,9 +77,23 @@ if [ "$NEW_ENV" = true ] ; then
 fi
 
 if [ "$BASIC" = true ] ; then
+    # Install system dependencies
+    apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        wget \
+        ffmpeg \
+        libgl1-mesa-glx \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        build-essential \
+        zlib1g-dev \
+        libeigen3-dev
+
     pip install imageio imageio-ffmpeg tqdm easydict opencv-python-headless ninja trimesh transformers gradio==6.0.1 tensorboard pandas lpips zstandard
     pip install git+https://github.com/EasternJournalist/utils3d.git@9a4eb15e4021b67b12c460c7057d642626897ec8
-    sudo apt install -y libjpeg-dev
+    
+    # Pillow SIMD needs zlib and jpeg dev first
     pip install pillow-simd
     pip install kornia timm
 fi
